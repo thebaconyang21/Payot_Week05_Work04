@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,6 +60,9 @@ namespace Payot_Week05_Work04
             txtCost.KeyPress += DecimalOnly_KeyPress;   // numbers + one "."
             txtPrice.KeyPress += DecimalOnly_KeyPress;
             txtMarkup.KeyPress += DecimalOnly_KeyPress;
+            txtCost.TextChanged += txtCost_TextChanged;   
+            txtMarkup.TextChanged += txtMarkup_TextChanged;
+            txtPrice.TextChanged += txtPrice_TextChanged; 
 
         }
 
@@ -97,6 +101,57 @@ namespace Payot_Week05_Work04
 
             lblBarcodeStatus.Text = exists ? "Barcode is already in use." : "Barcode is available.";
             lblBarcodeStatus.ForeColor = exists ? Color.Firebrick : Color.SeaGreen; // red or green
+        }
+
+        // converts text to a number; returns false if it isn't a valid number
+        private static bool TryParse(string text, out decimal value)
+        {
+            return decimal.TryParse(text, NumberStyles.Number, CultureInfo.InvariantCulture, out value);
+        }
+
+        // puts a number into a textbox with 2 decimals, without triggering the other handlers
+        private void SetText(TextBox target, decimal value)
+        {
+            isCalculating = true; // switch ON so we don't loop
+            try
+            {
+                target.Text = value.ToString("0.00", CultureInfo.InvariantCulture);
+            }
+            finally
+            {
+                isCalculating = false; // always switch OFF again
+            }
+        }
+
+        private void txtCost_TextChanged(object sender, EventArgs e)
+        {
+            if (isCalculating) return; // ignore changes made by our own code
+
+            decimal cost, markup, price;
+            if (!TryParse(txtCost.Text, out cost)) return; // no valid cost yet
+
+            if (TryParse(txtMarkup.Text, out markup))
+                SetText(txtPrice, cost * (1 + markup / 100m));            // cost + markup -> price
+            else if (cost > 0 && TryParse(txtPrice.Text, out price))
+                SetText(txtMarkup, (price - cost) / cost * 100m);         // cost + price -> markup
+        }
+
+        private void txtMarkup_TextChanged(object sender, EventArgs e)
+        {
+            if (isCalculating) return;
+
+            decimal cost, markup;
+            if (TryParse(txtCost.Text, out cost) && TryParse(txtMarkup.Text, out markup))
+                SetText(txtPrice, cost * (1 + markup / 100m)); // new markup -> new price
+        }
+
+        private void txtPrice_TextChanged(object sender, EventArgs e)
+        {
+            if (isCalculating) return;
+
+            decimal cost, price;
+            if (TryParse(txtCost.Text, out cost) && cost > 0 && TryParse(txtPrice.Text, out price))
+                SetText(txtMarkup, (price - cost) / cost * 100m); // new price -> new markup
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
