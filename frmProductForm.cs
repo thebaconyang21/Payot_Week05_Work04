@@ -21,6 +21,7 @@ namespace Payot_Week05_Work04
         {
             InitializeComponent();
             SetupForm();
+            WireEvents();
         }
 
         private void SetupForm()
@@ -48,6 +49,36 @@ namespace Payot_Week05_Work04
 
             // Set the error provider to display errors next to the controls
             errorProvider.BlinkStyle = ErrorBlinkStyle.NeverBlink;
+        }
+
+        private void WireEvents()
+        {
+            // KeyPress runs every time a key is pressed in the box
+            txtBarcode.KeyPress += DigitsOnly_KeyPress; // barcode: digits only
+            txtCost.KeyPress += DecimalOnly_KeyPress;   // numbers + one "."
+            txtPrice.KeyPress += DecimalOnly_KeyPress;
+            txtMarkup.KeyPress += DecimalOnly_KeyPress;
+
+        }
+
+        private void DigitsOnly_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // block anything that is not a digit (Backspace is a "control" key, so it still works)
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+                e.Handled = true; // Handled = true cancels the key
+        }
+
+        private void DecimalOnly_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            TextBox tb = (TextBox)sender; // which box was typed in
+
+            if (char.IsControl(e.KeyChar) || char.IsDigit(e.KeyChar))
+                return; // Backspace and digits are OK
+
+            if (e.KeyChar == '.' && !tb.Text.Contains("."))
+                return; // allow only one decimal point
+
+            e.Handled = true; // block everything else
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
