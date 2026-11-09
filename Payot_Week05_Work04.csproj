@@ -52,6 +52,7 @@
     <Compile Include="frmProductForm.Designer.cs">
       <DependentUpon>frmProductForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Product.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmProductForm.resx">

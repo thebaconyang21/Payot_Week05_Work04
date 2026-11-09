@@ -243,7 +243,7 @@
             // rdoLocal
             // 
             this.rdoLocal.AutoSize = true;
-            this.rdoLocal.Location = new System.Drawing.Point(15, 31);
+            this.rdoLocal.Location = new System.Drawing.Point(36, 31);
             this.rdoLocal.Name = "rdoLocal";
             this.rdoLocal.Size = new System.Drawing.Size(61, 20);
             this.rdoLocal.TabIndex = 0;
@@ -254,7 +254,7 @@
             // rdoAbroad
             // 
             this.rdoAbroad.AutoSize = true;
-            this.rdoAbroad.Location = new System.Drawing.Point(125, 30);
+            this.rdoAbroad.Location = new System.Drawing.Point(144, 30);
             this.rdoAbroad.Name = "rdoAbroad";
             this.rdoAbroad.Size = new System.Drawing.Size(73, 20);
             this.rdoAbroad.TabIndex = 1;

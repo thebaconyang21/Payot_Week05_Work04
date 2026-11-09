@@ -66,6 +66,8 @@ namespace Payot_Week05_Work04
             txtPrice.TextChanged += txtPrice_TextChanged;
 
             btnSave.Click += btnSave_Click; // tempo
+            btnClear.Click += btnClear_Click;   
+            btnCancel.Click += btnCancel_Click; 
 
             // remove a field's red icon as soon as the user edits it
             txtBarcode.TextChanged += ClearError_Changed;
@@ -74,9 +76,6 @@ namespace Payot_Week05_Work04
             txtCost.TextChanged += ClearError_Changed;
             txtPrice.TextChanged += ClearError_Changed;
             txtMarkup.TextChanged += ClearError_Changed;
-
-            btnClear.Click += btnClear_Click;   // NEW
-            btnCancel.Click += btnCancel_Click; // NEW
 
         }
 
@@ -224,7 +223,6 @@ namespace Payot_Week05_Work04
             return true; // all good
         }
 
-        // TEMPORARY: Step 6 will replace this with the real Save
         private void btnSave_Click(object sender, EventArgs e)
         {
             if (!ValidateForm()) return; // stop if any field is invalid
@@ -334,19 +332,5 @@ namespace Payot_Week05_Work04
         {
 
         }
-    }
-
-    public class Product
-    {
-        public string Barcode { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Category { get; set; }
-        public string Origin { get; set; }
-        public bool IsActive { get; set; }
-        public decimal Cost { get; set; }
-        public decimal Price { get; set; }
-        public decimal Markup { get; set; }
-        public decimal Profit { get { return Price - Cost; } }
     }
 }
