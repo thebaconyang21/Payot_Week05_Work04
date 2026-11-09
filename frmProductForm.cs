@@ -54,6 +54,7 @@ namespace Payot_Week05_Work04
 
         private void WireEvents()
         {
+
             // KeyPress runs every time a key is pressed in the box
             txtBarcode.KeyPress += DigitsOnly_KeyPress; // barcode: digits only
             txtBarcode.TextChanged += txtBarcode_TextChanged;
@@ -73,6 +74,9 @@ namespace Payot_Week05_Work04
             txtCost.TextChanged += ClearError_Changed;
             txtPrice.TextChanged += ClearError_Changed;
             txtMarkup.TextChanged += ClearError_Changed;
+
+            btnClear.Click += btnClear_Click;   // NEW
+            btnCancel.Click += btnCancel_Click; // NEW
 
         }
 
@@ -223,8 +227,92 @@ namespace Payot_Week05_Work04
         // TEMPORARY: Step 6 will replace this with the real Save
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (ValidateForm())
-                MessageBox.Show("All fields are valid!");
+            if (!ValidateForm()) return; // stop if any field is invalid
+
+            // build a Product from what the user typed
+            Product product = new Product
+            {
+                Barcode = txtBarcode.Text.Trim(),
+                Name = txtName.Text.Trim(),
+                Description = txtDescription.Text.Trim(),
+                Category = cmbCategory.SelectedItem.ToString(),
+                Origin = rdoLocal.Checked ? "Local" : "Abroad", // which radio is selected
+                IsActive = chkActive.Checked,
+                Cost = decimal.Parse(txtCost.Text, CultureInfo.InvariantCulture),
+                Price = decimal.Parse(txtPrice.Text, CultureInfo.InvariantCulture),
+                Markup = decimal.Parse(txtMarkup.Text, CultureInfo.InvariantCulture)
+            };
+
+            products.Add(product); // store it in the list
+
+            // show a summary ("\n" = new line)
+            MessageBox.Show(
+                "Product saved!\n\n" +
+                "Barcode: " + product.Barcode + "\n" +
+                "Name: " + product.Name + "\n" +
+                "Category: " + product.Category + "\n" +
+                "Origin: " + product.Origin + "\n" +
+                "Status: " + (product.IsActive ? "Active" : "Inactive") + "\n" +
+                "Cost: ₱" + product.Cost.ToString("N2") + "\n" +
+                "Price: ₱" + product.Price.ToString("N2") + "\n" +
+                "Markup: " + product.Markup.ToString("N2") + "%\n" +
+                "Profit per item: ₱" + product.Profit.ToString("N2") + "\n\n" +
+                "Total products saved: " + products.Count,
+                "Product Form", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            ClearForm(); // get ready for the next product
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            ClearForm();
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            if (HasData()) // only ask if something was typed
+            {
+                DialogResult result = MessageBox.Show(
+                    "Discard the information you entered and close the form?",
+                    "Cancel", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.No) return; // stay on the form
+            }
+            Close(); // close the form
+        }
+
+        // true if any field has something in it
+        private bool HasData()
+        {
+            return txtBarcode.Text.Length > 0 || txtName.Text.Length > 0 ||
+                   txtDescription.Text.Length > 0 || cmbCategory.SelectedIndex >= 0 ||
+                   txtCost.Text.Length > 0 || txtPrice.Text.Length > 0 ||
+                   txtMarkup.Text.Length > 0;
+        }
+
+        private void ClearForm()
+        {
+            isCalculating = true; // so clearing doesn't trigger the calculations
+            try
+            {
+                txtBarcode.Clear();
+                txtName.Clear();
+                txtDescription.Clear();
+                cmbCategory.SelectedIndex = -1; // nothing selected
+                rdoLocal.Checked = true;        // back to default
+                chkActive.Checked = false;
+                txtCost.Clear();
+                txtPrice.Clear();
+                txtMarkup.Clear();
+                lblBarcodeStatus.Text = "";
+            }
+            finally
+            {
+                isCalculating = false;
+            }
+
+            errorProvider.Clear(); // remove red icons
+            txtBarcode.Focus();    // cursor back to the first field
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
