@@ -55,6 +55,7 @@ namespace Payot_Week05_Work04
         {
             // KeyPress runs every time a key is pressed in the box
             txtBarcode.KeyPress += DigitsOnly_KeyPress; // barcode: digits only
+            txtBarcode.TextChanged += txtBarcode_TextChanged;
             txtCost.KeyPress += DecimalOnly_KeyPress;   // numbers + one "."
             txtPrice.KeyPress += DecimalOnly_KeyPress;
             txtMarkup.KeyPress += DecimalOnly_KeyPress;
@@ -79,6 +80,23 @@ namespace Payot_Week05_Work04
                 return; // allow only one decimal point
 
             e.Handled = true; // block everything else
+        }
+
+        private void txtBarcode_TextChanged(object sender, EventArgs e)
+        {
+            string code = txtBarcode.Text.Trim(); // text without extra spaces
+
+            if (code.Length == 0)
+            {
+                lblBarcodeStatus.Text = ""; // empty box = no message
+                return;
+            }
+
+            // does any saved product already have this barcode?
+            bool exists = products.Exists(p => p.Barcode == code);
+
+            lblBarcodeStatus.Text = exists ? "Barcode is already in use." : "Barcode is available.";
+            lblBarcodeStatus.ForeColor = exists ? Color.Firebrick : Color.SeaGreen; // red or green
         }
 
         private void textBox3_TextChanged(object sender, EventArgs e)
